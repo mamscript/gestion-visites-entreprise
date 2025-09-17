@@ -32,16 +32,23 @@ async function checkAuth() {
 async function loadApprentis() {
     try {
         const response = await fetch('/api/apprentis');
-        if (!response.ok) throw new Error('Erreur lors du chargement');
+        if (!response.ok) {
+            const errorData = await response.json().catch(() => ({ message: 'Erreur inconnue' }));
+            throw new Error(errorData.message || `Erreur ${response.status}: ${response.statusText}`);
+        }
         
         const data = await response.json();
-        apprentis = data.data;
+        apprentis = data.data || [];
         displayApprentis(apprentis);
         loadStats();
         populateGroupeFilter();
     } catch (error) {
         console.error('Erreur:', error);
-        showAlert('Erreur lors du chargement des apprentis', 'danger');
+        showAlert(`Erreur lors du chargement des apprentis: ${error.message}`, 'danger');
+        
+        // Afficher un message dans le tableau
+        const tbody = document.getElementById('apprentisTableBody');
+        tbody.innerHTML = `<tr><td colspan="7" class="text-center text-danger">Erreur: ${error.message}</td></tr>`;
     }
 }
 
@@ -49,13 +56,20 @@ async function loadApprentis() {
 async function loadEntreprises() {
     try {
         const response = await fetch('/api/admin/companies');
-        if (!response.ok) throw new Error('Erreur lors du chargement');
+        if (!response.ok) {
+            const errorData = await response.json().catch(() => ({ message: 'Erreur inconnue' }));
+            throw new Error(errorData.message || `Erreur ${response.status}: ${response.statusText}`);
+        }
         
         const data = await response.json();
-        entreprises = data.data;
+        entreprises = data.data || [];
         populateEntrepriseSelect();
     } catch (error) {
         console.error('Erreur:', error);
+        showAlert(`Erreur lors du chargement des entreprises: ${error.message}`, 'warning');
+        // Continuer sans les entreprises
+        entreprises = [];
+        populateEntrepriseSelect();
     }
 }
 
