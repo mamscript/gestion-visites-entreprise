@@ -42,6 +42,15 @@ app.get('/login', (req, res) => {
     res.sendFile(path.join(__dirname, 'public', 'login.html'));
 });
 
+// Route pour la gestion des apprentis
+app.get('/apprentis', (req, res) => {
+    if (req.session.user && req.session.user.role === 'manager') {
+        res.sendFile(path.join(__dirname, 'public', 'apprentis.html'));
+    } else {
+        res.redirect('/login');
+    }
+});
+
 // Routes selon le rôle
 app.get('/admin', (req, res) => {
     if (req.session.user && req.session.user.role === 'manager') {
