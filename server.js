@@ -44,11 +44,29 @@ app.get('/login', (req, res) => {
 
 // Route pour la gestion des apprentis
 app.get('/apprentis', (req, res) => {
+    console.log('Route /apprentis appelée');
     if (req.session.user && req.session.user.role === 'manager') {
+        console.log('Utilisateur autorisé, envoi du fichier apprentis.html');
         res.sendFile(path.join(__dirname, 'public', 'apprentis.html'));
     } else {
+        console.log('Utilisateur non autorisé, redirection vers login');
         res.redirect('/login');
     }
+});
+
+// Route de test pour vérifier que le serveur fonctionne
+app.get('/test-apprentis', (req, res) => {
+    res.json({ 
+        message: 'Route test apprentis fonctionne', 
+        timestamp: new Date().toISOString(),
+        user: req.session.user || 'non connecté'
+    });
+});
+
+// Route alternative pour les apprentis (sans vérification de session pour debug)
+app.get('/apprentis-debug', (req, res) => {
+    console.log('Route /apprentis-debug appelée');
+    res.sendFile(path.join(__dirname, 'public', 'apprentis.html'));
 });
 
 // Routes selon le rôle
