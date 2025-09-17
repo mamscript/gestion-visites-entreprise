@@ -11,6 +11,16 @@ const PORT = process.env.PORT || 3000;
 console.log('🚀 Serveur démarré sur le port', PORT);
 console.log('📅 Timestamp:', new Date().toISOString());
 
+// Route de test très simple au début
+app.get('/health', (req, res) => {
+    res.json({ 
+        status: 'OK', 
+        message: 'Serveur fonctionne',
+        timestamp: new Date().toISOString(),
+        port: PORT
+    });
+});
+
 // Middleware
 app.use(cors());
 app.use(express.json());
@@ -140,3 +150,6 @@ app.listen(PORT, () => {
     console.log(`Serveur démarré sur le port ${PORT}`);
     console.log(`Application accessible sur http://localhost:${PORT}`);
 });
+
+// Export pour Vercel
+module.exports = app;

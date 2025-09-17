@@ -8,22 +8,6 @@
   ],
   "routes": [
     {
-      "src": "/test",
-      "dest": "server.js"
-    },
-    {
-      "src": "/test-apprentis",
-      "dest": "server.js"
-    },
-    {
-      "src": "/apprentis",
-      "dest": "server.js"
-    },
-    {
-      "src": "/apprentis-debug",
-      "dest": "server.js"
-    },
-    {
       "src": "/(.*)",
       "dest": "server.js"
     }
