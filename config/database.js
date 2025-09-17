@@ -3,7 +3,7 @@ require('dotenv').config();
 let pool, connection;
 
 // Configuration de la base de données selon l'environnement
-if (process.env.NODE_ENV === 'production' && process.env.DATABASE_URL) {
+if (process.env.DATABASE_URL) {
     // Configuration PostgreSQL pour Vercel (production)
     const { Pool } = require('pg');
     
@@ -14,7 +14,7 @@ if (process.env.NODE_ENV === 'production' && process.env.DATABASE_URL) {
         }
     });
     
-    console.log('Configuration PostgreSQL pour Vercel activée');
+    console.log('Configuration PostgreSQL activée avec DATABASE_URL:', process.env.DATABASE_URL.substring(0, 50) + '...');
 } else {
     // Configuration MySQL pour le développement local
     const mysql = require('mysql2');
