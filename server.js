@@ -7,6 +7,10 @@ require('dotenv').config();
 const app = express();
 const PORT = process.env.PORT || 3000;
 
+// Log pour vérifier que le serveur démarre
+console.log('🚀 Serveur démarré sur le port', PORT);
+console.log('📅 Timestamp:', new Date().toISOString());
+
 // Middleware
 app.use(cors());
 app.use(express.json());
@@ -64,6 +68,15 @@ app.get('/test-apprentis', (req, res) => {
         message: 'Route test apprentis fonctionne', 
         timestamp: new Date().toISOString(),
         user: req.session.user || 'non connecté'
+    });
+});
+
+// Route de test très simple
+app.get('/test', (req, res) => {
+    res.json({ 
+        status: 'OK', 
+        message: 'Serveur fonctionne',
+        timestamp: new Date().toISOString()
     });
 });
 
