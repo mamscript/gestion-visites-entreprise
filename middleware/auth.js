@@ -35,22 +35,17 @@ const verifyPassword = async (password, hash) => {
 // Fonction pour authentifier un utilisateur
 const authenticateUser = async (username, password) => {
     try {
-        const result = await pool.execute(
-            'SELECT * FROM users WHERE username = ? AND is_active = 1',
+        // Utiliser la syntaxe PostgreSQL ($1, $2) au lieu de MySQL (?)
+        const result = await pool.query(
+            'SELECT * FROM users WHERE username = $1 AND is_active = true',
             [username]
         );
 
-        // Vérifier si result est un tableau (succès) ou une erreur
-        if (!Array.isArray(result) || result.length === 0) {
+        if (!result.rows || result.rows.length === 0) {
             return null;
         }
 
-        const [rows] = result;
-        if (rows.length === 0) {
-            return null;
-        }
-
-        const user = rows[0];
+        const user = result.rows[0];
         const isValidPassword = await verifyPassword(password, user.password_hash);
 
         if (!isValidPassword) {
@@ -71,8 +66,8 @@ const createUser = async (userData) => {
     try {
         const hashedPassword = await hashPassword(userData.password);
         
-        const [result] = await pool.execute(
-            'INSERT INTO users (username, email, password_hash, first_name, last_name, role) VALUES (?, ?, ?, ?, ?, ?)',
+        const result = await pool.query(
+            'INSERT INTO users (username, email, password_hash, first_name, last_name, role) VALUES ($1, $2, $3, $4, $5, $6) RETURNING id',
             [
                 userData.username,
                 userData.email,
@@ -83,7 +78,7 @@ const createUser = async (userData) => {
             ]
         );
 
-        return result.insertId;
+        return result.rows[0].id;
     } catch (error) {
         console.error('Erreur lors de la création de l\'utilisateur:', error);
         throw error;
@@ -93,11 +88,11 @@ const createUser = async (userData) => {
 // Fonction pour obtenir les utilisateurs par rôle
 const getUsersByRole = async (role) => {
     try {
-        const [rows] = await pool.execute(
-            'SELECT id, username, email, first_name, last_name, role, is_active, created_at FROM users WHERE role = ? AND is_active = 1',
+        const result = await pool.query(
+            'SELECT id, username, email, first_name, last_name, role, is_active, created_at FROM users WHERE role = $1 AND is_active = true',
             [role]
         );
-        return rows;
+        return result.rows;
     } catch (error) {
         console.error('Erreur lors de la récupération des utilisateurs:', error);
         throw error;
