@@ -1,0 +1,40 @@
+{
+  "name": "gestion-visites-entreprise",
+  "version": "1.0.0",
+  "description": "Application de gestion des visites d'entreprise pour centre de formation",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js",
+    "dev": "nodemon server.js",
+    "init-db": "node scripts/init-database.js",
+    "test-connection": "node scripts/test-connection.js"
+  },
+  "dependencies": {
+    "express": "^4.18.2",
+    "mysql2": "^3.6.5",
+    "bcryptjs": "^2.4.3",
+    "jsonwebtoken": "^9.0.2",
+    "express-session": "^1.17.3",
+    "express-validator": "^7.0.1",
+    "cors": "^2.8.5",
+    "dotenv": "^16.3.1",
+    "multer": "^1.4.5-lts.1",
+    "moment": "^2.29.4"
+  },
+  "devDependencies": {
+    "nodemon": "^3.0.2"
+  },
+  "keywords": [
+    "formation",
+    "apprentissage",
+    "visites",
+    "entreprise",
+    "gestion"
+  ],
+  "author": "Centre de Formation",
+  "license": "MIT",
+  "engines": {
+    "node": ">=14.0.0",
+    "npm": ">=6.0.0"
+  }
+}

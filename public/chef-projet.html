@@ -1,0 +1,437 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Chef de Projet - Gestion des Visites</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <link href="https://cdn.datatables.net/1.11.5/css/dataTables.bootstrap5.min.css" rel="stylesheet">
+    <style>
+        body {
+            background-color: #f8f9fa;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        .navbar {
+            background: linear-gradient(135deg, #4ecdc4 0%, #44a08d 100%);
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        .sidebar {
+            background: white;
+            box-shadow: 2px 0 10px rgba(0,0,0,0.1);
+            min-height: calc(100vh - 76px);
+        }
+        .sidebar .nav-link {
+            color: #495057;
+            padding: 12px 20px;
+            border-radius: 8px;
+            margin: 5px 10px;
+            transition: all 0.3s ease;
+        }
+        .sidebar .nav-link:hover,
+        .sidebar .nav-link.active {
+            background: linear-gradient(135deg, #4ecdc4 0%, #44a08d 100%);
+            color: white;
+        }
+        .main-content {
+            padding: 20px;
+        }
+        .card {
+            border: none;
+            border-radius: 15px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.08);
+            margin-bottom: 20px;
+        }
+        .card-header {
+            background: linear-gradient(135deg, #4ecdc4 0%, #44a08d 100%);
+            color: white;
+            border-radius: 15px 15px 0 0 !important;
+            padding: 15px 20px;
+        }
+        .btn-primary {
+            background: linear-gradient(135deg, #4ecdc4 0%, #44a08d 100%);
+            border: none;
+            border-radius: 8px;
+        }
+        .btn-success {
+            background: linear-gradient(135deg, #4ecdc4 0%, #44a08d 100%);
+            border: none;
+            border-radius: 8px;
+        }
+        .btn-warning {
+            background: linear-gradient(135deg, #ffd93d 0%, #ff6b6b 100%);
+            border: none;
+            border-radius: 8px;
+        }
+        .btn-danger {
+            background: linear-gradient(135deg, #ff6b6b 0%, #ee5a24 100%);
+            border: none;
+            border-radius: 8px;
+        }
+        .stats-card {
+            background: linear-gradient(135deg, #4ecdc4 0%, #44a08d 100%);
+            color: white;
+            border-radius: 15px;
+            padding: 20px;
+            margin-bottom: 20px;
+        }
+        .stats-number {
+            font-size: 2.5rem;
+            font-weight: bold;
+        }
+        .modal-content {
+            border-radius: 15px;
+            border: none;
+        }
+        .modal-header {
+            background: linear-gradient(135deg, #4ecdc4 0%, #44a08d 100%);
+            color: white;
+            border-radius: 15px 15px 0 0;
+        }
+        .form-control {
+            border-radius: 8px;
+            border: 2px solid #e9ecef;
+        }
+        .form-control:focus {
+            border-color: #4ecdc4;
+            box-shadow: 0 0 0 0.2rem rgba(78, 205, 196, 0.25);
+        }
+        .table {
+            border-radius: 10px;
+            overflow: hidden;
+        }
+        .badge {
+            border-radius: 20px;
+            padding: 8px 12px;
+        }
+        .visite-form {
+            background: white;
+            border-radius: 15px;
+            padding: 20px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.08);
+        }
+    </style>
+</head>
+<body>
+    <!-- Navbar -->
+    <nav class="navbar navbar-expand-lg navbar-dark">
+        <div class="container-fluid">
+            <a class="navbar-brand" href="#">
+                <i class="fas fa-user-check me-2"></i>
+                Chef de Projet - Visites d'Entreprise
+            </a>
+            <div class="navbar-nav ms-auto">
+                <div class="nav-item dropdown">
+                    <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-bs-toggle="dropdown">
+                        <i class="fas fa-user me-2"></i>
+                        <span id="userName">Chef de Projet</span>
+                    </a>
+                    <ul class="dropdown-menu">
+                        <li><a class="dropdown-item" href="#" onclick="logout()">
+                            <i class="fas fa-sign-out-alt me-2"></i>Déconnexion
+                        </a></li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <div class="container-fluid">
+        <div class="row">
+            <!-- Sidebar -->
+            <div class="col-md-3 col-lg-2 sidebar">
+                <nav class="nav flex-column">
+                    <a class="nav-link active" href="#" onclick="showSection('dashboard')">
+                        <i class="fas fa-tachometer-alt me-2"></i>Tableau de bord
+                    </a>
+                    <a class="nav-link" href="#" onclick="showSection('mes-visites')">
+                        <i class="fas fa-clipboard-list me-2"></i>Mes Visites
+                    </a>
+                    <a class="nav-link" href="#" onclick="showSection('nouvelle-visite')">
+                        <i class="fas fa-plus-circle me-2"></i>Nouvelle Visite
+                    </a>
+                    <a class="nav-link" href="#" onclick="showSection('mes-apprentis')">
+                        <i class="fas fa-users me-2"></i>Mes Apprentis
+                    </a>
+                    <a class="nav-link" href="#" onclick="showSection('suivi')">
+                        <i class="fas fa-chart-line me-2"></i>Suivi Annuel
+                    </a>
+                </nav>
+            </div>
+
+            <!-- Main Content -->
+            <div class="col-md-9 col-lg-10 main-content">
+                <!-- Dashboard Section -->
+                <div id="dashboard-section" class="content-section">
+                    <h2 class="mb-4">
+                        <i class="fas fa-tachometer-alt me-2"></i>
+                        Tableau de bord
+                    </h2>
+                    
+                    <div class="row">
+                        <div class="col-md-3">
+                            <div class="stats-card">
+                                <div class="d-flex justify-content-between">
+                                    <div>
+                                        <h6>Visites Effectuées</h6>
+                                        <div class="stats-number" id="statsVisitesEffectuees">-</div>
+                                    </div>
+                                    <i class="fas fa-check-circle fa-2x opacity-75"></i>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-3">
+                            <div class="stats-card">
+                                <div class="d-flex justify-content-between">
+                                    <div>
+                                        <h6>Apprentis Suivis</h6>
+                                        <div class="stats-number" id="statsApprentisSuivis">-</div>
+                                    </div>
+                                    <i class="fas fa-users fa-2x opacity-75"></i>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-3">
+                            <div class="stats-card">
+                                <div class="d-flex justify-content-between">
+                                    <div>
+                                        <h6>Visites Téléphone</h6>
+                                        <div class="stats-number" id="statsVisitesTelephone">-</div>
+                                    </div>
+                                    <i class="fas fa-phone fa-2x opacity-75"></i>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-3">
+                            <div class="stats-card">
+                                <div class="d-flex justify-content-between">
+                                    <div>
+                                        <h6>Visites Déplacement</h6>
+                                        <div class="stats-number" id="statsVisitesDeplacement">-</div>
+                                    </div>
+                                    <i class="fas fa-car fa-2x opacity-75"></i>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="card">
+                                <div class="card-header">
+                                    <h5 class="mb-0">Visites Récentes</h5>
+                                </div>
+                                <div class="card-body">
+                                    <div id="recentVisites">
+                                        <div class="text-center">
+                                            <div class="spinner-border" role="status">
+                                                <span class="visually-hidden">Chargement...</span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="card">
+                                <div class="card-header">
+                                    <h5 class="mb-0">Progression Mensuelle</h5>
+                                </div>
+                                <div class="card-body">
+                                    <div id="progressionMensuelle">
+                                        <div class="text-center">
+                                            <div class="spinner-border" role="status">
+                                                <span class="visually-hidden">Chargement...</span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Mes Visites Section -->
+                <div id="mes-visites-section" class="content-section" style="display: none;">
+                    <div class="d-flex justify-content-between align-items-center mb-4">
+                        <h2>
+                            <i class="fas fa-clipboard-list me-2"></i>
+                            Mes Visites
+                        </h2>
+                        <div class="btn-group" role="group">
+                            <button class="btn btn-outline-primary active" onclick="filterVisites('all')">
+                                Toutes
+                            </button>
+                            <button class="btn btn-outline-warning" onclick="filterVisites('planifiees')">
+                                Planifiées
+                            </button>
+                            <button class="btn btn-outline-success" onclick="filterVisites('effectuees')">
+                                Effectuées
+                            </button>
+                        </div>
+                    </div>
+                    
+                    <div class="card">
+                        <div class="card-body">
+                            <div class="table-responsive">
+                                <table class="table table-hover" id="visitesTable">
+                                    <thead>
+                                        <tr>
+                                            <th>Date</th>
+                                            <th>Apprenti</th>
+                                            <th>Groupe</th>
+                                            <th>Entreprise</th>
+                                            <th>Modalité</th>
+                                            <th>Statut</th>
+                                            <th>Actions</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody></tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Nouvelle Visite Section -->
+                <div id="nouvelle-visite-section" class="content-section" style="display: none;">
+                    <h2 class="mb-4">
+                        <i class="fas fa-plus-circle me-2"></i>
+                        Nouvelle Visite
+                    </h2>
+                    
+                    <div class="visite-form">
+                        <form id="visiteForm">
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <div class="mb-3">
+                                        <label for="apprenti_id" class="form-label">Apprenti *</label>
+                                        <select class="form-control" id="apprenti_id" name="apprenti_id" required>
+                                            <option value="">Sélectionner un apprenti</option>
+                                        </select>
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="mb-3">
+                                        <label for="date_visite" class="form-label">Date de la visite *</label>
+                                        <input type="date" class="form-control" id="date_visite" name="date_visite" required>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <div class="mb-3">
+                                        <label for="modalite" class="form-label">Modalité *</label>
+                                        <select class="form-control" id="modalite" name="modalite" required>
+                                            <option value="">Sélectionner une modalité</option>
+                                            <option value="telephone">Téléphone</option>
+                                            <option value="deplacement">Déplacement</option>
+                                        </select>
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="mb-3">
+                                        <label for="date_retour_apprenti" class="form-label">Date de retour de l'apprenti</label>
+                                        <input type="date" class="form-control" id="date_retour_apprenti" name="date_retour_apprenti">
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="mb-3">
+                                <label for="commentaire" class="form-label">Commentaire sur la visite</label>
+                                <textarea class="form-control" id="commentaire" name="commentaire" rows="4" 
+                                    placeholder="Décrivez comment se passe la relation entre l'apprenti et l'entreprise..."></textarea>
+                            </div>
+
+                            <div class="mb-3">
+                                <label for="apprecations" class="form-label">Appréciations</label>
+                                <textarea class="form-control" id="apprecations" name="apprecations" rows="3" 
+                                    placeholder="Appréciations sur la progression de l'apprenti..."></textarea>
+                            </div>
+
+                            <div class="d-flex justify-content-end">
+                                <button type="button" class="btn btn-secondary me-2" onclick="resetForm()">
+                                    <i class="fas fa-undo me-2"></i>Réinitialiser
+                                </button>
+                                <button type="submit" class="btn btn-primary">
+                                    <i class="fas fa-save me-2"></i>Enregistrer la Visite
+                                </button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+
+                <!-- Mes Apprentis Section -->
+                <div id="mes-apprentis-section" class="content-section" style="display: none;">
+                    <h2 class="mb-4">
+                        <i class="fas fa-users me-2"></i>
+                        Mes Apprentis
+                    </h2>
+                    
+                    <div class="card">
+                        <div class="card-body">
+                            <div class="table-responsive">
+                                <table class="table table-hover" id="apprentisTable">
+                                    <thead>
+                                        <tr>
+                                            <th>Nom</th>
+                                            <th>Prénom</th>
+                                            <th>Groupe</th>
+                                            <th>Entreprise</th>
+                                            <th>Maître d'Apprentissage</th>
+                                            <th>Visites Effectuées</th>
+                                            <th>Actions</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody></tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Suivi Section -->
+                <div id="suivi-section" class="content-section" style="display: none;">
+                    <h2 class="mb-4">
+                        <i class="fas fa-chart-line me-2"></i>
+                        Suivi des Visites Annuelles
+                    </h2>
+                    
+                    <div class="card">
+                        <div class="card-body">
+                            <div class="table-responsive">
+                                <table class="table table-hover" id="suiviTable">
+                                    <thead>
+                                        <tr>
+                                            <th>Apprenti</th>
+                                            <th>Groupe</th>
+                                            <th>Entreprise</th>
+                                            <th>Année</th>
+                                            <th>Visite 1</th>
+                                            <th>Visite 2</th>
+                                            <th>Visite 3</th>
+                                            <th>Visite 4</th>
+                                            <th>Progression</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody></tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modals -->
+    <div id="modalsContainer"></div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://cdn.datatables.net/1.11.5/js/jquery.dataTables.min.js"></script>
+    <script src="https://cdn.datatables.net/1.11.5/js/dataTables.bootstrap5.min.js"></script>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="js/chef-projet.js"></script>
+</body>
+</html>

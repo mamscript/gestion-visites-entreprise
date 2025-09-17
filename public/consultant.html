@@ -1,0 +1,499 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Consultant - Gestion des Visites</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <link href="https://cdn.datatables.net/1.11.5/css/dataTables.bootstrap5.min.css" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        body {
+            background-color: #f8f9fa;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        .navbar {
+            background: linear-gradient(135deg, #a8edea 0%, #fed6e3 100%);
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        .sidebar {
+            background: white;
+            box-shadow: 2px 0 10px rgba(0,0,0,0.1);
+            min-height: calc(100vh - 76px);
+        }
+        .sidebar .nav-link {
+            color: #495057;
+            padding: 12px 20px;
+            border-radius: 8px;
+            margin: 5px 10px;
+            transition: all 0.3s ease;
+        }
+        .sidebar .nav-link:hover,
+        .sidebar .nav-link.active {
+            background: linear-gradient(135deg, #a8edea 0%, #fed6e3 100%);
+            color: white;
+        }
+        .main-content {
+            padding: 20px;
+        }
+        .card {
+            border: none;
+            border-radius: 15px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.08);
+            margin-bottom: 20px;
+        }
+        .card-header {
+            background: linear-gradient(135deg, #a8edea 0%, #fed6e3 100%);
+            color: white;
+            border-radius: 15px 15px 0 0 !important;
+            padding: 15px 20px;
+        }
+        .btn-primary {
+            background: linear-gradient(135deg, #a8edea 0%, #fed6e3 100%);
+            border: none;
+            border-radius: 8px;
+            color: #495057;
+        }
+        .btn-success {
+            background: linear-gradient(135deg, #4ecdc4 0%, #44a08d 100%);
+            border: none;
+            border-radius: 8px;
+        }
+        .btn-warning {
+            background: linear-gradient(135deg, #ffd93d 0%, #ff6b6b 100%);
+            border: none;
+            border-radius: 8px;
+        }
+        .btn-info {
+            background: linear-gradient(135deg, #74b9ff 0%, #0984e3 100%);
+            border: none;
+            border-radius: 8px;
+        }
+        .stats-card {
+            background: linear-gradient(135deg, #a8edea 0%, #fed6e3 100%);
+            color: #495057;
+            border-radius: 15px;
+            padding: 20px;
+            margin-bottom: 20px;
+        }
+        .stats-number {
+            font-size: 2.5rem;
+            font-weight: bold;
+        }
+        .table {
+            border-radius: 10px;
+            overflow: hidden;
+        }
+        .badge {
+            border-radius: 20px;
+            padding: 8px 12px;
+        }
+        .chart-container {
+            position: relative;
+            height: 300px;
+            margin: 20px 0;
+        }
+        .export-buttons {
+            margin-bottom: 20px;
+        }
+        .filter-section {
+            background: white;
+            border-radius: 15px;
+            padding: 20px;
+            margin-bottom: 20px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.08);
+        }
+    </style>
+</head>
+<body>
+    <!-- Navbar -->
+    <nav class="navbar navbar-expand-lg navbar-dark">
+        <div class="container-fluid">
+            <a class="navbar-brand" href="#">
+                <i class="fas fa-chart-line me-2"></i>
+                Consultant - Visites d'Entreprise
+            </a>
+            <div class="navbar-nav ms-auto">
+                <div class="nav-item dropdown">
+                    <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-bs-toggle="dropdown">
+                        <i class="fas fa-user me-2"></i>
+                        <span id="userName">Consultant</span>
+                    </a>
+                    <ul class="dropdown-menu">
+                        <li><a class="dropdown-item" href="#" onclick="logout()">
+                            <i class="fas fa-sign-out-alt me-2"></i>Déconnexion
+                        </a></li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <div class="container-fluid">
+        <div class="row">
+            <!-- Sidebar -->
+            <div class="col-md-3 col-lg-2 sidebar">
+                <nav class="nav flex-column">
+                    <a class="nav-link active" href="#" onclick="showSection('dashboard')">
+                        <i class="fas fa-tachometer-alt me-2"></i>Tableau de bord
+                    </a>
+                    <a class="nav-link" href="#" onclick="showSection('visites')">
+                        <i class="fas fa-clipboard-list me-2"></i>Visites
+                    </a>
+                    <a class="nav-link" href="#" onclick="showSection('apprentis')">
+                        <i class="fas fa-users me-2"></i>Apprentis
+                    </a>
+                    <a class="nav-link" href="#" onclick="showSection('entreprises')">
+                        <i class="fas fa-building me-2"></i>Entreprises
+                    </a>
+                    <a class="nav-link" href="#" onclick="showSection('suivi')">
+                        <i class="fas fa-chart-line me-2"></i>Suivi Annuel
+                    </a>
+                    <a class="nav-link" href="#" onclick="showSection('rapports')">
+                        <i class="fas fa-file-alt me-2"></i>Rapports
+                    </a>
+                </nav>
+            </div>
+
+            <!-- Main Content -->
+            <div class="col-md-9 col-lg-10 main-content">
+                <!-- Dashboard Section -->
+                <div id="dashboard-section" class="content-section">
+                    <h2 class="mb-4">
+                        <i class="fas fa-tachometer-alt me-2"></i>
+                        Tableau de bord - Vue d'ensemble
+                    </h2>
+                    
+                    <div class="row">
+                        <div class="col-md-3">
+                            <div class="stats-card">
+                                <div class="d-flex justify-content-between">
+                                    <div>
+                                        <h6>Apprentis Actifs</h6>
+                                        <div class="stats-number" id="statsApprentis">-</div>
+                                    </div>
+                                    <i class="fas fa-users fa-2x opacity-75"></i>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-3">
+                            <div class="stats-card">
+                                <div class="d-flex justify-content-between">
+                                    <div>
+                                        <h6>Entreprises</h6>
+                                        <div class="stats-number" id="statsEntreprises">-</div>
+                                    </div>
+                                    <i class="fas fa-building fa-2x opacity-75"></i>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-3">
+                            <div class="stats-card">
+                                <div class="d-flex justify-content-between">
+                                    <div>
+                                        <h6>Visites Cette Année</h6>
+                                        <div class="stats-number" id="statsVisites">-</div>
+                                    </div>
+                                    <i class="fas fa-clipboard-list fa-2x opacity-75"></i>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-3">
+                            <div class="stats-card">
+                                <div class="d-flex justify-content-between">
+                                    <div>
+                                        <h6>Chefs de Projet</h6>
+                                        <div class="stats-number" id="statsChefs">-</div>
+                                    </div>
+                                    <i class="fas fa-user-tie fa-2x opacity-75"></i>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="card">
+                                <div class="card-header">
+                                    <h5 class="mb-0">Visites par Modalité</h5>
+                                </div>
+                                <div class="card-body">
+                                    <div class="chart-container">
+                                        <canvas id="modaliteChart"></canvas>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="card">
+                                <div class="card-header">
+                                    <h5 class="mb-0">Visites par Mois</h5>
+                                </div>
+                                <div class="card-body">
+                                    <div class="chart-container">
+                                        <canvas id="moisChart"></canvas>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="card">
+                                <div class="card-header">
+                                    <h5 class="mb-0">Répartition par Groupe</h5>
+                                </div>
+                                <div class="card-body">
+                                    <div class="chart-container">
+                                        <canvas id="groupesChart"></canvas>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="card">
+                                <div class="card-header">
+                                    <h5 class="mb-0">Top Entreprises</h5>
+                                </div>
+                                <div class="card-body">
+                                    <div id="topEntreprises">
+                                        <div class="text-center">
+                                            <div class="spinner-border" role="status">
+                                                <span class="visually-hidden">Chargement...</span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Visites Section -->
+                <div id="visites-section" class="content-section" style="display: none;">
+                    <div class="d-flex justify-content-between align-items-center mb-4">
+                        <h2>
+                            <i class="fas fa-clipboard-list me-2"></i>
+                            Consultation des Visites
+                        </h2>
+                        <div class="export-buttons">
+                            <button class="btn btn-success" onclick="exportVisites('csv')">
+                                <i class="fas fa-file-csv me-2"></i>Export CSV
+                            </button>
+                            <button class="btn btn-info" onclick="exportVisites('pdf')">
+                                <i class="fas fa-file-pdf me-2"></i>Export PDF
+                            </button>
+                        </div>
+                    </div>
+
+                    <div class="filter-section">
+                        <div class="row">
+                            <div class="col-md-3">
+                                <label for="filterPeriode" class="form-label">Période</label>
+                                <select class="form-control" id="filterPeriode" onchange="filterVisites()">
+                                    <option value="tout">Toutes les périodes</option>
+                                    <option value="mois">Ce mois</option>
+                                    <option value="annee">Cette année</option>
+                                </select>
+                            </div>
+                            <div class="col-md-3">
+                                <label for="filterStatut" class="form-label">Statut</label>
+                                <select class="form-control" id="filterStatut" onchange="filterVisites()">
+                                    <option value="">Tous les statuts</option>
+                                    <option value="planifiee">Planifiées</option>
+                                    <option value="effectuee">Effectuées</option>
+                                    <option value="annulee">Annulées</option>
+                                </select>
+                            </div>
+                            <div class="col-md-3">
+                                <label for="filterModalite" class="form-label">Modalité</label>
+                                <select class="form-control" id="filterModalite" onchange="filterVisites()">
+                                    <option value="">Toutes les modalités</option>
+                                    <option value="telephone">Téléphone</option>
+                                    <option value="deplacement">Déplacement</option>
+                                </select>
+                            </div>
+                            <div class="col-md-3">
+                                <label for="filterChefProjet" class="form-label">Chef de Projet</label>
+                                <select class="form-control" id="filterChefProjet" onchange="filterVisites()">
+                                    <option value="">Tous les chefs de projet</option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="card">
+                        <div class="card-body">
+                            <div class="table-responsive">
+                                <table class="table table-hover" id="visitesTable">
+                                    <thead>
+                                        <tr>
+                                            <th>Date</th>
+                                            <th>Apprenti</th>
+                                            <th>Groupe</th>
+                                            <th>Entreprise</th>
+                                            <th>Chef de Projet</th>
+                                            <th>Modalité</th>
+                                            <th>Statut</th>
+                                            <th>Actions</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody></tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Apprentis Section -->
+                <div id="apprentis-section" class="content-section" style="display: none;">
+                    <h2 class="mb-4">
+                        <i class="fas fa-users me-2"></i>
+                        Consultation des Apprentis
+                    </h2>
+                    
+                    <div class="card">
+                        <div class="card-body">
+                            <div class="table-responsive">
+                                <table class="table table-hover" id="apprentisTable">
+                                    <thead>
+                                        <tr>
+                                            <th>Nom</th>
+                                            <th>Prénom</th>
+                                            <th>Groupe</th>
+                                            <th>Entreprise</th>
+                                            <th>Maître d'Apprentissage</th>
+                                            <th>Nb Visites</th>
+                                            <th>Actions</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody></tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Entreprises Section -->
+                <div id="entreprises-section" class="content-section" style="display: none;">
+                    <h2 class="mb-4">
+                        <i class="fas fa-building me-2"></i>
+                        Consultation des Entreprises
+                    </h2>
+                    
+                    <div class="card">
+                        <div class="card-body">
+                            <div class="table-responsive">
+                                <table class="table table-hover" id="entreprisesTable">
+                                    <thead>
+                                        <tr>
+                                            <th>Nom</th>
+                                            <th>Enseigne</th>
+                                            <th>Adresse</th>
+                                            <th>Téléphone</th>
+                                            <th>Email</th>
+                                            <th>Nb Apprentis</th>
+                                            <th>Nb Visites</th>
+                                            <th>Actions</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody></tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Suivi Section -->
+                <div id="suivi-section" class="content-section" style="display: none;">
+                    <h2 class="mb-4">
+                        <i class="fas fa-chart-line me-2"></i>
+                        Suivi des Visites Annuelles
+                    </h2>
+                    
+                    <div class="card">
+                        <div class="card-body">
+                            <div class="table-responsive">
+                                <table class="table table-hover" id="suiviTable">
+                                    <thead>
+                                        <tr>
+                                            <th>Apprenti</th>
+                                            <th>Groupe</th>
+                                            <th>Entreprise</th>
+                                            <th>Année</th>
+                                            <th>Visite 1</th>
+                                            <th>Visite 2</th>
+                                            <th>Visite 3</th>
+                                            <th>Visite 4</th>
+                                            <th>Progression</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody></tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Rapports Section -->
+                <div id="rapports-section" class="content-section" style="display: none;">
+                    <h2 class="mb-4">
+                        <i class="fas fa-file-alt me-2"></i>
+                        Rapports et Analyses
+                    </h2>
+                    
+                    <div class="row">
+                        <div class="col-md-4">
+                            <div class="card">
+                                <div class="card-header">
+                                    <h5 class="mb-0">Rapport Mensuel</h5>
+                                </div>
+                                <div class="card-body">
+                                    <p>Générer un rapport des visites du mois en cours</p>
+                                    <button class="btn btn-primary" onclick="generateReport('mois')">
+                                        <i class="fas fa-download me-2"></i>Générer
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="card">
+                                <div class="card-header">
+                                    <h5 class="mb-0">Rapport Annuel</h5>
+                                </div>
+                                <div class="card-body">
+                                    <p>Générer un rapport des visites de l'année en cours</p>
+                                    <button class="btn btn-primary" onclick="generateReport('annee')">
+                                        <i class="fas fa-download me-2"></i>Générer
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="card">
+                                <div class="card-header">
+                                    <h5 class="mb-0">Rapport Complet</h5>
+                                </div>
+                                <div class="card-body">
+                                    <p>Générer un rapport de toutes les visites</p>
+                                    <button class="btn btn-primary" onclick="generateReport('tout')">
+                                        <i class="fas fa-download me-2"></i>Générer
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://cdn.datatables.net/1.11.5/js/jquery.dataTables.min.js"></script>
+    <script src="https://cdn.datatables.net/1.11.5/js/dataTables.bootstrap5.min.js"></script>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="js/consultant.js"></script>
+</body>
+</html>
