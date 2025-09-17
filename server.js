@@ -69,6 +69,10 @@ app.get('/apprentis-debug', (req, res) => {
     res.sendFile(path.join(__dirname, 'public', 'apprentis.html'));
 });
 
+// Servir les fichiers statiques
+app.use('/js', express.static(path.join(__dirname, 'public', 'js')));
+app.use('/css', express.static(path.join(__dirname, 'public', 'css')));
+
 // Routes selon le rôle
 app.get('/admin', (req, res) => {
     if (req.session.user && req.session.user.role === 'manager') {

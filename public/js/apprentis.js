@@ -4,13 +4,19 @@ let apprentis = [];
 let entreprises = [];
 let currentApprentiId = null;
 
+// Vérification que le script est chargé
+console.log('Script apprentis.js chargé');
+
 // Initialisation
 document.addEventListener('DOMContentLoaded', function() {
+    console.log('DOM chargé, initialisation...');
     checkAuth();
     loadApprentis();
     loadEntreprises();
     setupEventListeners();
 });
+
+// Les fonctions seront assignées à window après leur définition
 
 // Vérification de l'authentification
 async function checkAuth() {
@@ -180,14 +186,29 @@ function clearFilters() {
 
 // Afficher le modal d'ajout
 function showAddApprentiModal() {
-    currentApprentiId = null;
-    document.getElementById('apprentiModalTitle').textContent = 'Ajouter un Apprenti';
-    document.getElementById('apprentiForm').reset();
-    document.getElementById('statut').value = 'actif';
-    document.getElementById('annee_formation').value = new Date().getFullYear();
-    
-    new bootstrap.Modal(document.getElementById('apprentiModal')).show();
+    try {
+        currentApprentiId = null;
+        document.getElementById('apprentiModalTitle').textContent = 'Ajouter un Apprenti';
+        document.getElementById('apprentiForm').reset();
+        document.getElementById('statut').value = 'actif';
+        document.getElementById('annee_formation').value = new Date().getFullYear();
+        
+        // Vérifier si Bootstrap est disponible
+        if (typeof bootstrap !== 'undefined' && bootstrap.Modal) {
+            new bootstrap.Modal(document.getElementById('apprentiModal')).show();
+        } else {
+            // Fallback si Bootstrap n'est pas chargé
+            document.getElementById('apprentiModal').style.display = 'block';
+            document.getElementById('apprentiModal').classList.add('show');
+        }
+    } catch (error) {
+        console.error('Erreur dans showAddApprentiModal:', error);
+        alert('Erreur lors de l\'ouverture du modal: ' + error.message);
+    }
 }
+
+// Assigner la fonction à window pour qu'elle soit accessible globalement
+window.showAddApprentiModal = showAddApprentiModal;
 
 // Modifier un apprenti
 async function editApprenti(id) {
