@@ -17,16 +17,26 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(express.static('public'));
 
-// Configuration de la session
+// Configuration de la session optimisée pour Vercel
 app.use(session({
-    secret: process.env.SESSION_SECRET || 'default-secret',
-    resave: false,
-    saveUninitialized: false,
+    secret: process.env.SESSION_SECRET || 'default-secret-change-in-production',
+    resave: true, // Changé pour Vercel
+    saveUninitialized: true, // Changé pour Vercel
     cookie: {
-        secure: false, // Mettre à true en production avec HTTPS
-        maxAge: 24 * 60 * 60 * 1000 // 24 heures
-    }
+        secure: false, // Garder false pour Vercel
+        maxAge: 24 * 60 * 60 * 1000, // 24 heures
+        httpOnly: true, // Sécurité
+        sameSite: 'lax' // Compatibilité Vercel
+    },
+    name: 'gestion-visites-session' // Nom unique pour éviter les conflits
 }));
+
+// Middleware pour logger les sessions
+app.use((req, res, next) => {
+    console.log('Session ID:', req.sessionID);
+    console.log('Session user:', req.session.user);
+    next();
+});
 
 // Routes
 app.use('/api/auth', require('./routes/auth'));

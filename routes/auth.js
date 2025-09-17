@@ -28,6 +28,8 @@ router.post('/login', [
 
         // Créer la session
         req.session.user = user;
+        console.log('Session créée pour user:', user.username);
+        console.log('Session ID:', req.sessionID);
 
         res.json({
             message: 'Connexion réussie',
