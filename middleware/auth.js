@@ -35,11 +35,17 @@ const verifyPassword = async (password, hash) => {
 // Fonction pour authentifier un utilisateur
 const authenticateUser = async (username, password) => {
     try {
-        const [rows] = await pool.execute(
+        const result = await pool.execute(
             'SELECT * FROM users WHERE username = ? AND is_active = 1',
             [username]
         );
 
+        // Vérifier si result est un tableau (succès) ou une erreur
+        if (!Array.isArray(result) || result.length === 0) {
+            return null;
+        }
+
+        const [rows] = result;
         if (rows.length === 0) {
             return null;
         }
