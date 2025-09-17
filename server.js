@@ -30,6 +30,7 @@ app.use('/api/admin', require('./routes/admin'));
 app.use('/api/chef-projet', require('./routes/chef-projet'));
 app.use('/api/consultant', require('./routes/consultant'));
 app.use('/api/visites', require('./routes/visites'));
+app.use('/api/apprentis', require('./routes/apprentis'));
 
 // Route principale
 app.get('/', (req, res) => {
